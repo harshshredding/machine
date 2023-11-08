@@ -19,35 +19,50 @@ D=A
 @numScreenByte
 M=D
 
-@currScreenByte
-M=0
-
-@drawValue
-M=0
 
 (LOOP)
     // initialize variables
-    @currScreenByte
+    @currScreenByteIdx
+    M=0
+   
+    @SCREEN
+    D=A
+    @currScreenByteAddress
+    M=D
+
+    @drawValue
     M=0
 
-    // select draw value
-    
+    // set draw value
+    @24576 
+    D=M
+    @DRAWSCREEN
+    D;JEQ
+    @drawValue
+    M=-1
 
     (DRAWSCREEN)
         // check if we are out of screen
-        @currScreenByte
+        @currScreenByteIdx
         D=M
         @numScreenByte
         D=M-D
         @DONEDRAWING
-        D;JMP
+        D;JEQ
 
-        @currScreenByte
+        // draw the byte
+        @drawValue
         D=M
 
+        @currScreenByteAddress
+        A=M
+        M=D
          
         // update state 
-        @currScreenByte
+        @currScreenByteIdx
+        M=M+1
+
+        @currScreenByteAddress
         M=M+1
 
         @DRAWSCREEN
