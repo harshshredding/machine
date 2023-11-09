@@ -65,6 +65,16 @@ CHIP CPU {
     /**
     *  Counter
     */
-    PC(in=Aout,load=,inc=true,reset=reset,out=pc);
+    Or(a=isOutputZero, b=isOutputNegative, out=isOutputNegativeOrZero);
+    Not(in=isOutputNegativeOrZero, out=isOutputPositive);
+
+    And(a=isOutputNegative, b=instruction[2], out=isNegativeJump);
+    And(a=isOutputZero, b=instruction[1], out=isZeroJump);
+    And(a=isOutputPositive, b=instruction[0], out=isPositiveJump);
+
+    Or(a=isNegativeJump, b=isZeroJump, out=partialJumpLoad);
+    Or(a=partialJumpLoad, b=isPositiveJump, out=jumpLoad);
+
+    PC(in=Aout, load=jumpLoad, inc=true, reset=reset, out[0..14]=pc);
 
 }
