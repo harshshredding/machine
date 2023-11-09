@@ -38,7 +38,8 @@ CHIP CPU {
      */    
     Mux16(a=instruction,b=ALUout,sel=instruction[15],out=selectedARegisterInput);
     Not(in=instruction[15], out=NotOpCode);
-    Register(in=selectedARegisterInput,load=,out=);
+    Or(a=NotOpCode, b=instruction[5], out=isALoaded);
+    Register(in=selectedARegisterInput, load=isALoaded, out=Aout, out[0..14]=addressM);
 
 
 }
