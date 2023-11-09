@@ -49,11 +49,17 @@ CHIP CPU {
 
 
     /**
+    * Select between A and M
+    */
+    Mux16(a=Aout, b=inM, sel=instruction[12], out=AorM);
+
+    /**
     *  ALU
     *  x=D
     */
 
-    ALU(x=Dout,y=,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6]);
+    ALU(x=Dout, y=AorM, zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6], out=ALUout, zr=isOutputZero, ng=isOutputNegative);
+
 
     /**
     *  PC
