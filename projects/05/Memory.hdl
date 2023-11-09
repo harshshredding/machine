@@ -22,18 +22,39 @@ CHIP Memory {
     /**
     * Get Main Ram output.
     */
-    Not(in=address[14], out=canloadMainRam);
-    And(a=load, b=canloadMainRam, out=loadMainRam);
+    Not(in=address[14], out=mainRamSelected);
+    And(a=load, b=mainRamSelected, out=loadMainRam);
     RAM16K(in=in, address=address[0..13], load=loadMainRam, out=mainRamOut);
 
+    /**
+    * Get Screen output.
+    */
+    Not(in=mainRamSelected, out=mainRamNotSelected);
+    Not(in=address[13], out=canLoadScreen);
+    And(a=mainRamNotSelected, b=canLoadScreen, out=screenSelected);
+    And(a=load, b=screenSelected, out=loadScreen);
+    Screen(in=in, load=loadScreen, address=address[0..12], out=screenOut);
 
     /**
-    * Get IO output 
+    * Get Keyboard output.
     */
-    Not(in=canloadMainRam, out=canLoadIO);
-    And(a=canLoadIO, b=load, out=loadIO);
-    RAM16K(in=in, address=address[0..13], load=loadIO, out=ioOut); 
-
-    Mux16(a=ioOut, b=mainRamOut, sel=canloadMainRam, out=out);
-
+    And(a=mainRamNotSelected, b=address[13], out=lastTwoBitsAreOne);
+    Or8Way(in=address[5..12], out=orEightBits);
+    Or(a=orEightBits, b=address[4], out=or0);
+    Or(a=or0, b=address[3], out=or1);
+    Or(a=or1, b=address[2], out=or2);
+    Or(a=or2, b=address[1], out=or3);
+    Or(a=or3, b=address[0], out=orFirst13Bits);
+    Not(in=orFirst13Bits, out=first13BitsAreZero);
+    And(a=first13BitsAreZero, b=lastTwoBitsAreOne, out=keyboardSelected);
+    Keyboard(out=keyboardOut);
+    
+    /**
+    * Select between the three outputs. 
+    */
+    Mux16(a=false, b=mainRamOut, sel=mainRamSelected, out=mainRamOutMasked);
+    Mux16(a=false, b=screenOut, sel=screenSelected, out=screenOutMasked);
+    Mux16(a=false, b=keyboardOut, sel=keyboardSelected, out=keyboardMasked);
+    Add16(a=mainRamOutMasked, b=screenOutMasked, out=partialOutput);
+    Add16(a=partialOutput, b=keyboardMasked, out=out);
 }
