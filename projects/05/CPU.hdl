@@ -37,14 +37,16 @@ CHIP CPU {
      *  A Register
      */    
     Mux16(a=instruction,b=ALUout,sel=instruction[15],out=selectedARegisterInput);
-    Not(in=instruction[15], out=NotOpCode);
-    Or(a=NotOpCode, b=instruction[5], out=isALoaded);
-    Register(in=selectedARegisterInput, load=isALoaded, out=Aout, out[0..14]=addressM);
+    Not(in=instruction[15], out=isAInstruction);
+    Not(in=isAInstruction, out=isCInstruction);
+    Or(a=isAInstruction, b=instruction[5], out=isALoaded);
+    ARegister(in=selectedARegisterInput, load=isALoaded, out=Aout, out[0..14]=addressM);
 
     /**
      *  D Register
      */    
-    Register(in=ALUout, load=instruction[4], out=Dout);
+    And(a=isCInstruction, b=instruction[4], out=writeD);
+    DRegister(in=ALUout, load=writeD, out=Dout);
 
     /**
     * Select between A and M
@@ -60,7 +62,7 @@ CHIP CPU {
     /**
     * Whether to write M or not
     */
-    Or(a=false, b=register[3], out=writeM);
+    And(a=isCInstruction, b=instruction[3], out=writeM);
 
     /**
     *  Counter
