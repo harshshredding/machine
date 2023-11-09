@@ -42,4 +42,22 @@ CHIP CPU {
     Register(in=selectedARegisterInput, load=isALoaded, out=Aout, out[0..14]=addressM);
 
 
+    /**
+     *  D Register
+     */    
+    Register(in=ALUout, load=instruction[4], out=Dout);
+
+
+    /**
+    *  ALU
+    *  x=D
+    */
+
+    ALU(x=Dout,y=,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6]);
+
+    /**
+    *  PC
+    */
+    PC(
+
 }
