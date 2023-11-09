@@ -32,5 +32,13 @@ CHIP CPU {
         pc[15];          // Address of next instruction
 
     PARTS:
-    //// Replace this comment with your code.
+
+    /**
+     *  A Register
+     */    
+    Mux16(a=instruction,b=ALUout,sel=instruction[15],out=selectedARegisterInput);
+    Not(in=instruction[15], out=NotOpCode);
+    Register(in=selectedARegisterInput,load=,out=);
+
+
 }
