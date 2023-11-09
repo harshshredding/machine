@@ -19,5 +19,21 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    //// Replace this comment with your code.
+    /**
+    * Get Main Ram output.
+    */
+    Not(in=address[14], out=canloadMainRam);
+    And(a=load, b=canloadMainRam, out=loadMainRam);
+    RAM16K(in=in, address=address[0..13], load=loadMainRam, out=mainRamOut);
+
+
+    /**
+    * Get IO output 
+    */
+    Not(in=canloadMainRam, out=canLoadIO);
+    And(a=canLoadIO, b=load, out=loadIO);
+    RAM16K(in=in, address=address[0..13], load=loadIO, out=ioOut); 
+
+    Mux16(a=ioOut, b=mainRamOut, sel=canloadMainRam, out=out);
+
 }
