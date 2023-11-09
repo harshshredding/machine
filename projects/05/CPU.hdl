@@ -77,6 +77,8 @@ CHIP CPU {
     Or(a=isNegativeJump, b=isZeroJump, out=partialJumpLoad);
     Or(a=partialJumpLoad, b=isPositiveJump, out=jumpLoad);
 
-    PC(in=Aout, load=jumpLoad, inc=true, reset=reset, out[0..14]=pc);
+    And(a=isCInstruction, b=jumpLoad, out=jumpLoadFinal);
+
+    PC(in=Aout, load=jumpLoadFinal, inc=true, reset=reset, out[0..14]=pc);
 
 }
